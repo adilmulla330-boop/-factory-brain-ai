@@ -155,8 +155,6 @@ Sri Venkateswara College of Engineering (SVCE), Tirupati
 
 📜 License
 
-This project is intended for educational, research, and innovation purposes.
-
-⸻
+This project is intended for educational, research, and innovation purpose 
 
 “Transforming Industrial Knowledge into Intelligent Action.”
