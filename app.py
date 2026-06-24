@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
-from ollama import chat
+from groq import Groq
+import os
 import streamlit as st
 st.set_page_config(page_title="OmniCorp Industrial Copilot", layout="wide", page_icon="⚙️")
 import chromadb
@@ -8,6 +9,15 @@ import pandas as pd
 import re
 from ddgs import DDGS
 from datetime import datetime
+
+client_groq = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def groq_chat(messages, model="llama-3.3-70b-versatile"):
+    response = client_groq.chat.completions.create(
+        model=model,
+        messages=messages
+    )
+    return response.choices[0].message.content
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -77,13 +87,9 @@ if app_mode == "QMS Dashboard":
                         import uuid
                         insp_id = f"INSP-{str(uuid.uuid4())[:4].upper()}"
                         date_str = datetime.now().strftime("%Y-%m-%d")
-                        
-                        from ollama import chat
-                        ai_response = chat(
-                            model="llama3.2",
-                            messages=[{"role": "user", "content": f"A field inspector found the following issue on {eq_tag} ({eq_type}): '{finding}'. Risk level is {risk_level}. Generate a short, 1-sentence recommended corrective action."}]
-                        )
-                        rec_action = ai_response['message']['content'].strip()
+                        rec_action = groq_chat([
+                            {"role": "user", "content": f"A field inspector found the following issue on {eq_tag} ({eq_type}): '{finding}'. Risk level is {risk_level}. Generate a short, 1-sentence recommended corrective action."}
+                        ]).strip()
                         
                         new_row = f'{insp_id},{date_str},{eq_tag},{eq_type},{inspector},"{finding}",{risk_level},"{rec_action}"\n'
                         with open("documents/failure_inspections.csv", "a", encoding="utf-8") as f:
@@ -115,23 +121,7 @@ if app_mode == "Vision Scanner":
             api_key = api_key_input.strip() or os.getenv("GEMINI_API_KEY")
             
             if not api_key:
-                # Use local Moondream vision model via Ollama
-                with st.spinner("Analyzing document with local Moondream AI (Offline)..."):
-                    try:
-                        import ollama
-                        response = ollama.chat(
-                            model="moondream",
-                            messages=[{
-                                "role": "user",
-                                "content": "Describe this industrial image, extract any visible text, equipment tags, and summarize its contents.",
-                                "images": [uploaded_file.getvalue()]
-                            }]
-                        )
-                        st.success("Local Analysis Complete")
-                        st.markdown("### 👁️ Analysis Results (Moondream AI)")
-                        st.write(response['message']['content'])
-                    except Exception as e:
-                        st.error(f"Local Vision failed. Ensure Ollama is running and moondream is installed. Error: {e}")
+                st.warning("Local Moondream via Ollama is not supported on Streamlit Cloud. Please provide a Gemini API key to use Vision Analysis.")
             else:
                 with st.spinner("Analyzing document with Gemini Vision..."):
                     try:
@@ -199,26 +189,23 @@ if question:
         start_time = time.time()
 
         with st.chat_message("assistant"):
-            response = chat(
-                model="llama3.2",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": """
+            groq_response = groq_chat([
+                {
+                    "role": "system",
+                    "content": """
 You are Factory Brain AI.
 Be friendly, conversational and professional.
 Introduce yourself when greeted.
 Explain that you can help with manufacturing, RCA, compliance, maintenance troubleshooting, lessons learned and industrial insights.
 """
-                    },
-                    {
-                        "role": "user",
-                        "content": question
-                    }
-                ]
-            )
+                },
+                {
+                    "role": "user",
+                    "content": question
+                }
+            ])
 
-            st.markdown(response.message.content)
+            st.markdown(groq_response)
 
         response_time = round(time.time() - start_time, 2)
         st.session_state.avg_response_time = response_time
@@ -226,7 +213,7 @@ Explain that you can help with manufacturing, RCA, compliance, maintenance troub
         st.session_state.messages.append(
             {
                 "role": "assistant",
-                "content": response.message.content
+                "content": groq_response
             }
         )
 
@@ -440,11 +427,7 @@ SUGGESTED_Q: [Question 3]
 
         with st.chat_message("assistant"):
             with st.spinner("🧠 Factory Brain AI is analyzing documents, detecting intent, and generating insights..."):
-                response = chat(
-                    model="llama3.2",
-                    messages=conversation
-                )
-            raw_content = response.message.content
+                raw_content = groq_chat(conversation)
             
             suggested_qs = []
             clean_content_lines = []
