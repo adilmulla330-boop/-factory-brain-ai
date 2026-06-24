@@ -1,0 +1,29 @@
+DOCUMENT TYPE: Piping and Instrumentation Diagram (P&ID) - Text Representation
+SYSTEM: Primary Reactor Cooling Loop
+DIAGRAM ID: PID-402-REV-A
+
+COMPONENTS AND TAGS:
+1. PMP-102A (Primary Cooling Water Pump)
+   - Type: Centrifugal Pump
+   - Design Pressure: 150 PSI
+   - Flow Rate: 120 GPM
+   - Connected to: Pipe Segment L-01 (Suction) and L-02 (Discharge)
+
+2. VLV-304 (Main Flow Control Valve)
+   - Type: Pneumatic Control Valve
+   - Fail State: Fail-Closed (FC)
+   - Connected to: Pipe Segment L-02
+
+3. HX-201 (Primary Heat Exchanger)
+   - Type: Shell and Tube
+   - Shell Side fluid: Cooling Water
+   - Tube Side fluid: Reactor Product
+   - Operating Temperature: 85°C
+
+4. SENS-T45 (Temperature Transmitter)
+   - Range: 0-150°C
+   - Alarm High (AH): 95°C
+   - Alarm High-High (AHH): 105°C (Triggers Emergency Shutdown)
+
+PROCESS FLOW SUMMARY:
+The centrifugal pump (PMP-102A) draws cooling water from the main reservoir and feeds it through the control valve (VLV-304). The water then enters the shell side of the heat exchanger (HX-201) to absorb heat from the reactor product. Temperature is continuously monitored by SENS-T45 at the discharge outlet.

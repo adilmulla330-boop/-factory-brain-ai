@@ -1,0 +1,7 @@
+Inspection_ID,Date,Equipment_Tag,Equipment_Type,Inspector,Finding,Risk_Level,Recommended_Action
+INSP-901,2026-06-20,PMP-102A,Centrifugal Pump,Sarah Jenkins,Seal leak detected on suction side,High,Replace mechanical seal immediately.
+INSP-902,2026-06-21,HX-201,Heat Exchanger,David Thorne,Minor scaling on tube side,Low,Schedule chemical cleaning during next planned outage.
+INSP-903,2026-06-22,VLV-304,Control Valve,Kiran Kumar,Actuator responding slowly to pressure drops,Medium,Calibrate positioner and check air supply lines.
+INSP-904,2026-06-23,BLST-04,Blast Furnace,Marcus Sterling,Refractory lining degradation observed,Critical,Halt operation and initiate emergency refractory relining to prevent thermal breach.
+INSP-905,2026-06-24,MOT-55,Induction Motor,Sarah Jenkins,Abnormal vibration at high loads,High,Perform laser alignment and check bearing health.
+INSP-01B2,2026-06-24,omo0wss,generator,adil,"internal",Medium,"The field inspector recommends replacing or repairing the faulty component to resolve the internal issue with the generator, and ensuring proper maintenance and inspection of similar components in the future."

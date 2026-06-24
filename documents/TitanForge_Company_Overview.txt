@@ -1,0 +1,20 @@
+TitanForge Industries - Company Overview & Details
+
+Founded: 1985
+Headquarters: Detroit, Michigan
+Core Business: Heavy industrial manufacturing, precision metallurgy, and large-scale machining for aerospace, automotive, and energy sectors.
+
+Facilities:
+- Plant A (Detroit, MI): Primary casting and heavy machinery operation. ISO9001 and ISO45001 certified. Features 12 heavy duty CNC mills and 4 industrial blast furnaces.
+- Plant B (Cleveland, OH): Specialized in precision gears, hydraulic systems, and compressor testing. Features a dedicated Quality Assurance lab and non-destructive testing (NDT) facility.
+- Plant C (Dallas, TX): Assembly and logistics hub. Handles integration of motors, gearboxes, and control valves before final shipping.
+
+Executive Leadership:
+- CEO: Marcus Sterling
+- VP of Engineering: Sarah Jenkins
+- Chief Safety Officer: David Thorne
+
+Strategic Goals (2026-2030):
+1. Achieve zero unplanned downtime across all plants using predictive AI maintenance.
+2. Reduce carbon footprint by 25% via optimized blast furnace scheduling.
+3. Attain 100% compliance with OSHA and PESO regulations.
