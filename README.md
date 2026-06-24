@@ -1,160 +1,98 @@
 🏭 Factory Brain AI
 
-An AI-powered Industrial Intelligence Assistant designed to help manufacturing organizations improve maintenance, reliability, safety, compliance, and operational decision-making through Retrieval-Augmented Generation (RAG), Vector Search, and Large Language Models.
+An AI-powered document intelligence system that enables users to upload PDF documents, perform semantic search, and receive context-aware answers using Retrieval-Augmented Generation (RAG).
 
-🚀 Overview
-
-Factory Brain AI combines enterprise knowledge, maintenance records, inspection reports, safety manuals, root cause analysis documents, and operational procedures into a single intelligent assistant.
-
-The platform enables engineers, operators, maintenance teams, and managers to quickly retrieve information, analyze incidents, generate recommendations, and make data-driven decisions.
+---
 
 ✨ Features
 
-🔍 Intelligent Document Search
+- 📄 PDF Document Processing
+- 🤖 AI-Powered Question Answering
+- 🔍 Semantic Search with ChromaDB
+- 🧠 Context-Aware Responses
+- ⚡ Retrieval-Augmented Generation (RAG)
+- 🌐 Streamlit Web Interface
+- 📚 Knowledge Base Management
+- 🔒 Secure Local Processing
 
-* Semantic search using vector embeddings
-* Retrieval-Augmented Generation (RAG)
-* Context-aware responses from industrial documents
+---
 
-🛠 Maintenance Intelligence
+🛠️ Technology Stack
 
-* Equipment troubleshooting support
-* Maintenance recommendations
-* Historical failure analysis
-* Predictive maintenance insights
+- Frontend: Streamlit
+- LLM: Groq API
+- Vector Database: ChromaDB
+- Embeddings: Sentence Transformers
+- Programming Language: Python
+- Deployment: Render
 
-📊 Root Cause Analysis (RCA)
+---
 
-* Failure investigation assistance
-* Incident pattern detection
-* Lessons learned retrieval
-* Corrective action suggestions
+📁 Project Structure
 
-🛡 Safety & Compliance Support
-
-* Safety procedure retrieval
-* Compliance document search
-* Risk assessment assistance
-* Audit preparation support
-
-📋 Inspection Management
-
-* Equipment inspection logging
-* AI-generated corrective actions
-* Failure tracking and reporting
-* Knowledge base enrichment
-
-🤖 AI Assistant
-
-* Natural language conversations
-* Manufacturing-specific guidance
-* Engineering knowledge support
-* Industrial decision assistance
-
-⸻
-
-🏗 Technology Stack
-
-Frontend
-
-* Streamlit
-
-AI & Machine Learning
-
-* Sentence Transformers
-* Groq API
-* Retrieval-Augmented Generation (RAG)
-
-Vector Database
-
-* ChromaDB
-
-Data Processing
-
-* Pandas
-* NumPy
-* PyPDF
-
-Visualization
-
-* Plotly
-* Streamlit AGraph
-
-Search
-
-* DuckDuckGo Search (DDGS)
-
-⸻
-
-📂 Project Structure
-
-factory-brain-ai/
+Factory-Brain-AI/
 │
 ├── app.py
-├── rag_chat.py
-├── search.py
-├── index_titanforge.py
-│
-├── documents/
-│   ├── Maintenance Manuals
-│   ├── Safety Procedures
-│   ├── RCA Reports
-│   ├── Audit Reports
-│   └── Training Documents
-│
-├── db/
-│   └── ChromaDB Vector Store
-│
 ├── requirements.txt
+├── chroma_db/
+├── data/
+├── utils/
+├── assets/
 └── README.md
 
-⚙️ Installation
+---
 
-git clone https://github.com/adilmulla330-boop/-factory-brain-ai.git
-cd -factory-brain-ai
-python3 -m venv venv
-source venv/bin/activate
+🚀 Installation
+
+1. Clone Repository
+
+git clone https://github.com/your-username/Factory-Brain-AI.git
+cd Factory-Brain-AI
+
+2. Install Dependencies
+
 pip install -r requirements.txt
 
-▶️ Run Application
+3. Configure API Key
+
+Create a ".env" file:
+
+GROQ_API_KEY=your_api_key_here
+
+4. Run Application
 
 streamlit run app.py
 
-🔑 Environment Variables
+---
 
-Create a .env file or configure secrets:
+🎯 How It Works
 
-GROQ_API_KEY=your_api_key_here
-GEMINI_API_KEY=your_api_key_here
+1. Upload PDF documents.
+2. Documents are processed and embedded.
+3. ChromaDB stores vector representations.
+4. User queries are matched semantically.
+5. Groq LLM generates context-aware responses.
 
-🎯 Use Cases
+---
 
-* Manufacturing Operations
-* Reliability Engineering
-* Asset Management
-* Industrial Maintenance
-* Safety Management
-* Compliance Audits
-* Failure Analysis
-* Knowledge Management
+🔮 Future Enhancements
 
-📈 Future Enhancements
+- Multi-document chat
+- Voice-based interaction
+- OCR support
+- User authentication
+- Cloud knowledge synchronization
 
-* Multi-Agent AI Architecture
-* Predictive Failure Forecasting
-* IoT Sensor Integration
-* Industrial Digital Twin Support
-* Advanced Analytics Dashboard
-* Real-Time Alerting System
+---
 
-👨‍💻 Author
+👨‍💻 Developer
 
 Mulla Adil
-Computer Science & Engineering Student
-Sri Venkateswara College of Engineering (SVCE), Tirupati
+B.Tech CSE Student
+Sri Venkateswara College of Engineering, Tirupati
+
+---
 
 📜 License
 
-This project is intended for educational, research, and innovation purpose 
-
-“Transforming Industrial Knowledge into Intelligent Action.”
+This project is licensed under the MIT License.
