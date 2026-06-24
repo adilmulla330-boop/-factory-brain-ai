@@ -5,3 +5,11 @@ pandas
 numpy
 pypdf
 openpyxl
+ddgs
+streamlit-option-menu
+plotly
+streamlit-agraph
+google-generativeai
+groq
+torch
+torchvision

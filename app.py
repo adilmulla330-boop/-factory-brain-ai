@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer
+import streamlit as st
 from groq import Groq
 import os
-import streamlit as st
 st.set_page_config(page_title="OmniCorp Industrial Copilot", layout="wide", page_icon="⚙️")
 import chromadb
 import time
@@ -10,6 +10,7 @@ import re
 from ddgs import DDGS
 from datetime import datetime
 
+# Load Groq API Key from Render/Environment Variables
 client_groq = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def groq_chat(messages, model="llama-3.3-70b-versatile"):
@@ -28,13 +29,22 @@ if "avg_response_time" not in st.session_state:
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 client = chromadb.PersistentClient(path="db")
-collection = client.get_collection("factory_docs")
+collection = client.get_or_create_collection("factory_docs")
 st.title("OmniCorp Industrial Copilot")
 
-st.sidebar.image("/Users/mullaadil/.gemini/antigravity/brain/5cf9f6ac-27d4-4a10-95d4-68a2375a5787/omnicorp_logo_1782286036215.png", use_container_width=True)
-st.sidebar.caption(f"Database Records Synchronized: {collection.count()}")
+try:
+    record_count = collection.count()
+except Exception:
+    record_count = 0
+
+if os.path.exists("omnicorp_logo.png"):
+    st.sidebar.image("omnicorp_logo.png", use_container_width=True)
+st.sidebar.caption(f"Database Records Synchronized: {record_count}")
 
 from streamlit_option_menu import option_menu
+import plotly.express as px
+import plotly.graph_objects as go
+from streamlit_agraph import agraph, Node, Edge, Config
 with st.sidebar:
     app_mode = option_menu(
         menu_title=None,
@@ -45,7 +55,6 @@ with st.sidebar:
 
 if app_mode == "QMS Dashboard":
     st.header("Quality & Maintenance Dashboard")
-    import plotly.express as px
     try:
         df_dt = pd.read_excel("documents/downtime_tracker.xlsx")
         fig1 = px.bar(df_dt, x="Machine", y="Hours", color="Reason", title="Downtime by Machine")
@@ -111,7 +120,6 @@ if app_mode == "QMS Dashboard":
 if app_mode == "Vision Scanner":
     st.header("P&ID Parsing & Document Digitization")
     st.write("Upload a P&ID diagram, schematic, or scanned form.")
-    import os
     api_key_input = st.text_input("Gemini API Key", type="password", help="Enter your Gemini API key. Alternatively, set GEMINI_API_KEY in a .env file.")
     
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
@@ -175,8 +183,8 @@ greetings = [
 ]
 
 if question:
-
     is_general_chat = question.lower().strip() in greetings
+
 
     if is_general_chat:
         st.session_state.messages.append(
@@ -270,39 +278,43 @@ Explain that you can help with manufacturing, RCA, compliance, maintenance troub
         if not context.strip() or len(context.strip()) < 50:
             context = "NO_RELEVANT_CONTEXT_FOUND"
 
-        equipment_keywords = [
-            "motor", "pump", "bearing", "compressor",
-            "gearbox", "valve", "turbine"
-        ]
-
-        issue_keywords = [
-            "overheating", "failure", "vibration",
-            "leak", "trip", "damage", "shutdown"
-        ]
-
-        for eq in equipment_keywords:
-            if eq.lower() in context.lower():
-                for issue in issue_keywords:
-                    if issue.lower() in context.lower():
-                        graph_edges.append([eq.title(), issue.title()])
-
-
-        # Fast Heuristic Classifier (Replaces slow LLM call)
+        # Fast AI-driven Knowledge Graph & Classifier using Groq's instant model
         mode = "Knowledge"
         try:
-            q_lower = question.lower()
-            distances = results.get("distances", [[]])[0]
+            prompt = f"""
+Analyze the query and context.
+1. Classify query into: RCA, Compliance, Lessons, Knowledge, or External. 
+CRITICAL: If it asks about real-world facts (Elon Musk, Google CEO, dates, etc.), classify as External.
+2. Extract up to 4 relationship pairs from the context. Format as a JSON array of 3-item arrays: [["Source Entity", "Target Entity", "Relationship Description"]].
+
+Query: {question}
+Context snippet: {context[:1000]}
+
+Respond EXACTLY in this format:
+MODE: [Classification]
+GRAPH: [JSON Array]
+"""
+            # Use the 8b-instant model to make this pass lightning fast
+            ai_analysis = groq_chat([{"role": "user", "content": prompt}], model="llama-3.1-8b-instant")
             
-            # If the closest document is very far (distance > 1.6), it's an external real-world query
-            if distances and distances[0] > 1.6:
-                mode = "External"
-            elif any(k in q_lower for k in ["fail", "root cause", "rca", "incident", "break", "broken", "vibration", "leak", "damage", "shutdown"]):
-                mode = "RCA"
-            elif any(k in q_lower for k in ["audit", "compliance", "iso", "safety", "rule", "protocol"]):
-                mode = "Compliance"
-            elif any(k in q_lower for k in ["lesson", "past", "history", "pattern", "learned"]):
-                mode = "Lessons"
-        except Exception:
+            for line in ai_analysis.split('\n'):
+                if line.startswith("MODE:"):
+                    m = line.replace("MODE:", "").strip()
+                    if m in ["RCA", "Compliance", "Lessons", "Knowledge", "External"]:
+                        mode = m
+                elif "GRAPH:" in line or line.strip().startswith("[["):
+                    import json
+                    try:
+                        json_str = line.replace("GRAPH:", "").strip()
+                        edges = json.loads(json_str)
+                        for edge in edges:
+                            if len(edge) >= 3:
+                                graph_edges.append([str(edge[0]).title(), str(edge[1]).title(), str(edge[2]).title()])
+                            elif len(edge) == 2:
+                                graph_edges.append([str(edge[0]).title(), str(edge[1]).title(), "Related To"])
+                    except:
+                        pass
+        except:
             pass
 
         if mode == "Knowledge":
@@ -455,8 +467,6 @@ SUGGESTED_Q: [Question 3]
             }
         )
 
-        import re
-        import plotly.graph_objects as go
         machine_match = re.search(r'([A-Z]{3}-\d{2,3}[A-Z]?)', question.upper())
         if machine_match:
             tag = machine_match.group(1)
@@ -512,19 +522,24 @@ if graph_edges and not is_general_chat:
     st.divider()
     st.subheader("🕸️ Knowledge Graph")
 
-    from streamlit_agraph import agraph, Node, Edge, Config
     nodes = []
     edges = []
     node_ids = set()
     
-    for eq, issue in graph_edges:
+    for edge_data in graph_edges:
+        if len(edge_data) == 3:
+            eq, issue, rel = edge_data
+        else:
+            eq, issue = edge_data[0], edge_data[1]
+            rel = "Related To"
+            
         if eq not in node_ids:
             nodes.append(Node(id=eq, label=eq, size=25, shape="circularImage", image="https://cdn-icons-png.flaticon.com/512/2000/2000300.png"))
             node_ids.add(eq)
         if issue not in node_ids:
             nodes.append(Node(id=issue, label=issue, size=20, color="#FF5733"))
             node_ids.add(issue)
-        edges.append(Edge(source=eq, target=issue, label="has_issue"))
+        edges.append(Edge(source=eq, target=issue, label=rel))
         
-    config = Config(width=700, height=400, directed=True, nodeHighlightBehavior=True, highlightColor="#F7A7A6", collapsible=True)
+    config = Config(width=700, height=400, directed=True, nodeHighlightBehavior=True, highlightColor="#F7A7A6", collapsible=True, physics=False, staticGraph=True)
     agraph(nodes=nodes, edges=edges, config=config)
