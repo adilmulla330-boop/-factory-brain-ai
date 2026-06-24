@@ -1,0 +1,7 @@
+streamlit
+sentence-transformers
+chromadb
+pandas
+numpy
+pypdf
+openpyxl
